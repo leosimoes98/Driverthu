@@ -1,0 +1,32 @@
+name: Gerar APK Android
+
+on:
+  workflow_dispatch: # Permite iniciar manualmente pela aba Actions
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v3
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Configurar EAS CLI
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Instalar dependências
+        working-directory: ./frontend
+        run: npm install
+
+      - name: Compilar APK
+        working-directory: ./frontend
+        run: eas build --platform android --profile preview --non-interactive
